@@ -23,7 +23,7 @@ server = SimpleXMLRPCServer(("localhost", 5000), allow_none = True)
 map_tuple_uri = {}
 ack_track = {}
 
-def replicate_tuple_to_all(name, data):
+def replicate_tuple_to_all(name, data): # method to replicate the data to every node in teh cluster
     global map_tuple_uri, ack_track
     for key, val in map_tuple_uri.items():
         if key != name:
@@ -32,7 +32,7 @@ def replicate_tuple_to_all(name, data):
 
     return "Sucessfully replicated\n"
 
-def delete_from_file(data):
+def delete_from_file(data): #helper to delete the data from the file
     with open("log_data.txt","r+") as f:
         new_f = f.readlines()
         f.seek(0)
@@ -46,7 +46,7 @@ def delete_from_file(data):
         f.truncate()
     return True
 
-def delete_from_all(name, data):
+def delete_from_all(name, data): # helper to delete data from everywhere to maintain consistency
     global map_tuple_uri
     for key, val in map_tuple_uri.items():
         if key != name:
@@ -55,13 +55,13 @@ def delete_from_all(name, data):
     if delete_from_file(data):
         return True
 
-def logging(data):
+def logging(data):  # method to log the data  in file
     with open('log_data.txt', 'a') as f:
         f.write(str(data))
         f.write("\n")
     return True
 
-def write_to_TupleSpace(data_from_RPC):
+def write_to_TupleSpace(data_from_RPC): #helper to Write the value from the TS
     global map_tuple_uri, ack_track
     if map_tuple_uri[data_from_RPC[0]][1] == True:
         URI = map_tuple_uri[data_from_RPC[0]][0]
@@ -76,7 +76,7 @@ def write_to_TupleSpace(data_from_RPC):
             if logging(data_from_RPC):
                 del ack_track[data_from_RPC[-1]]
 
-def Read_from_TupleSpace(data_from_RPC):
+def Read_from_TupleSpace(data_from_RPC): #helper to read the value from the TS
     global map_tuple_uri
     if map_tuple_uri[data_from_RPC[0]][1] == True:
         URI = map_tuple_uri[data_from_RPC[0]][0]
@@ -84,7 +84,7 @@ def Read_from_TupleSpace(data_from_RPC):
         res = operation_on_Ts._rd([data_from_RPC[1],data_from_RPC[2], data_from_RPC[3], None])
     return str(res)
 
-def Delete_from_TupleSpace(data_from_RPC):
+def Delete_from_TupleSpace(data_from_RPC): #helper to delete the value from the TS
     global map_tuple_uri
     if map_tuple_uri[data_from_RPC[0]][1] == True:
         URI = map_tuple_uri[data_from_RPC[0]][0]
@@ -94,11 +94,10 @@ def Delete_from_TupleSpace(data_from_RPC):
             return str(res)
 
 
-def async_check_helper(URI):
+def async_check_helper(URI): #helper fucntion to check the node status async
     check_stats = proxy.TupleSpaceAdapter(URI)
     try:
         active_node = check_stats._rd([None, None, None, None])
-        print(active_node)
         if active_node:
             return True
     except Exception as e:
@@ -106,23 +105,19 @@ def async_check_helper(URI):
         return False
 
 
-def check_status_for_nodes():
+def check_status_for_nodes(): #method to check the node status
     global map_tuple_uri
     for key, val in map_tuple_uri.items():
         with concurrent.futures.ThreadPoolExecutor() as executor:
-            print("inside check")
             results = [executor.submit(async_check_helper, val[0])]
             for f in concurrent.futures.as_completed(results):
-                print(f.result())
                 if f.result():
                     map_tuple_uri[key][1] = True
-                    print(map_tuple_uri)
                 else:
                     map_tuple_uri[key][1] = False
-                    print(map_tuple_uri)
 
 
-def recover_TupleSpace(URI):
+def recover_TupleSpace(URI): #method to recover the TupleSpaces
     file = open("log_data.txt","r")
     content = file.readlines()
     results = []
@@ -170,7 +165,6 @@ def main(address = '224.0.0.1', port = '54322'):
                 ack_track[res[-1]] = 1
                 ack_track[res[-1]] += 1
 
-            # check_status_for_nodes()
     except Exception as e:
         print(e)
         sock.close()
@@ -201,7 +195,8 @@ t1.start()
 t2 = Thread(target=server_handler_for_delete)
 t2.start()
 
-def heartbeat():
+
+def heartbeat(): #method to check the heartbeat of the nodes in the cluster
     while True:
         time.sleep(30)
         check_status_for_nodes()

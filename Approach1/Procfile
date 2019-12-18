@@ -1,0 +1,23 @@
+# See <https://www.ruby-forum.com/t/forcing-stdout-sync-for-scripts/48876/8>
+name_tuplespace: ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' tuplespace.rb -c name.yaml
+name_adapter:ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' adapter.rb -c name.yaml
+
+name_server_tuplespace:ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' tuplespace.rb -c name_server.yaml
+name_server_adapter:ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' adapter.rb -c name_server.yaml
+
+#subscribe:python3 subscribe.py 224.0.0.1
+
+alice_tuplespace: ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' tuplespace.rb -c alice.yaml
+alice_adapter: ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' adapter.rb -c alice.yaml
+
+#bob_tuplespace: ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' tuplespace.rb -c bob.yaml
+#bob_adapter: ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' adapter.rb -c bob.yaml
+
+#chuck_tuplespace: ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' tuplespace.rb chuck.yaml
+#chuck_adapter: ruby -e '$stdout.sync = true; load($0 = ARGV.shift)' adapter.rb chuck.yaml
+
+client:python3 client.py 
+
+
+
+

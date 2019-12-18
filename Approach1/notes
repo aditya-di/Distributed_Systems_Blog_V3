@@ -1,0 +1,45 @@
+======================================================================
+1.Our task is to write: 
+  client.py ->This will be client application program with TS data as a command line argument.
+  command line argument to the client.
+  
+  recovery.py->For recovery of the tuplespace. 
+  naming.py  ->For address resolution.
+======================================================================
+Questions/ Doubts for approach 1. 
+1.  When Alice.py will run,Who will be sending the notifications?->Alice's tuplespace?
+    Notify which port? Tuplespace or adapter. 
+    Alice->B,C
+    Bob->A,C
+    Chuck->A,B
+
+2.Do we have to replicate the data in all tuplespaces for APPROACH 1?
+Yes.
+
+3. naming.py will store/register the following data in TUPLESPACE: 
+   Who's tuplespace/Address+portnumber
+   EX:Alice/URI/port/
+
+4. recovery.py will store the data in .txt file with following structure.
+   EX:
+   Alice/write/"abc","chapter 1","Token ring"
+   Alice/in/"abc","chapter 1","Token ring"
+   It will use naming.py while recovering the data for address resolution.
+
+5. TS/Adapter required for:
+   Alice 
+   Bob 
+   Chuck 
+   Naming 
+   
+   TS/Adapter not required: 
+   recovery.
+
+6.client.py will interact with naming and name_resolution.
+ 
+
+
+
+
+
+
